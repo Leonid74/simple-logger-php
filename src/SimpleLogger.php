@@ -16,7 +16,7 @@
  * file that was distributed with this source code.
  */
 
-// phpcs:disable Generic.Files.LineLength.TooLong, PSR2.Classes.PropertyDeclaration.Underscore
+// phpcs:disable Generic.Files.LineLength.TooLong, PSR2.Classes.PropertyDeclaration.Underscore, PSR2.Methods.MethodDeclaration.Underscore
 
 declare(strict_types=1);
 
@@ -193,7 +193,7 @@ class SimpleLogger
             }
 
             if (!isset($this->strLogFilePath)) {
-                $this->strLogFilePath = $this->__getLogFullFileNameWithPath();
+                $this->strLogFilePath = $this->_getLogFullFileNameWithPath();
                 $this->strLogFilePath = dirname($this->strLogFilePath) . DIRECTORY_SEPARATOR . $strLogDate . '_' . basename($this->strLogFilePath);
             }
 
@@ -278,7 +278,7 @@ class SimpleLogger
      *
      * @return string|false
      */
-    private function __getLogFullFileNameWithPath()
+    private function _getLogFullFileNameWithPath()
     {
         try {
             $this->strLogFileName = str_replace([':', '*', '?', '"', '<', '>', '|'], '', $this->strLogFileName);
