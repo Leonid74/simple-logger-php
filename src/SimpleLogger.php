@@ -140,9 +140,13 @@ class SimpleLogger
      */
     public function setDefaultTimezone(string $strTimezone)
     {
-        if (!$this->isEnable) return false;
+        if (!$this->isEnable) {
+            return false;
+        }
 
-        if (strtolower(trim($strTimezone)) === strtolower($this->strTimezone)) return true;
+        if (strtolower(trim($strTimezone)) === strtolower($this->strTimezone)) {
+            return true;
+        }
 
         if (!date_default_timezone_set($strTimezone)) {
             throw new SimpleLoggerException('Cannot set Default Timezone');
@@ -165,7 +169,9 @@ class SimpleLogger
     public function toLog($logData, $strLogTitle = null, $isPrintOnScreen = false)
     {
         try {
-            if (!$this->isEnable) return false;
+            if (!$this->isEnable) {
+                return false;
+            }
 
             $timeStart          = microtime(true);
             $timeElapsed        = isset($this->timeLastSave) ? sprintf(', +%.5f sec', $timeStart - $this->timeLastSave) : ', new session!';
@@ -265,12 +271,12 @@ class SimpleLogger
         try {
             if (function_exists('random_bytes')) {
                 $bytes = random_bytes((int) ceil($length / 2));
+                return $prefix . substr(bin2hex($bytes), 0, $length);
             } elseif (function_exists('openssl_random_pseudo_bytes')) {
                 $bytes = openssl_random_pseudo_bytes((int) ceil($length / 2));
-            } else {
-                throw new SimpleLoggerException('Found no available cryptographically secure random function');
+                return $prefix . substr(bin2hex($bytes), 0, $length);
             }
-            return $prefix . substr(bin2hex($bytes), 0, $length);
+            throw new SimpleLoggerException('Found no available cryptographically secure random function');
         } catch (SimpleLoggerException $e) {
             printf('%s' . $this->strEol, $e->getMessage());
             return false;
