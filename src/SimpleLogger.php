@@ -189,7 +189,7 @@ class SimpleLogger
             $strData2Log = sprintf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage) . $this->strEol . $this->strPreOpen . 'TITLE: ' . $strLogTitle . $this->strEol . $strDataTmp . $this->strPreClose . $this->strEol . $this->strEol;
 
             if ($isPrintOnScreen) {
-                echo $strData2Log;
+                print_r($strData2Log);
             }
 
             if (!isset($this->strLogFilePath)) {
