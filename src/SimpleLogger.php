@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Simple logger class that creates logs when an exception is thrown and
  * sends debugging information to the screen and via email (optional)
@@ -15,7 +16,9 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+// phpcs:disable Generic.Files.LineLength.TooLong, PSR2.Classes.PropertyDeclaration.Underscore
+
+declare(strict_types=1);
 
 namespace Leonid74\SimpleLogger;
 
@@ -109,7 +112,7 @@ class SimpleLogger
      *
      * @var array
      */
-    private static $arrInstances = [];
+    private static $__arrInstances = [];
 
     /**
      * Get instance object of \SimpleLogger
@@ -124,10 +127,10 @@ class SimpleLogger
         // Сделать оценку активности при вызове, с учетом порядка вызова функций
         //if (!self::$isEnable) return false;
 
-        if (!isset(self::$arrInstances[$strLogFileName])) {
-            self::$arrInstances[$strLogFileName] = new self($strLogFileName);
+        if (!isset(self::$__arrInstances[$strLogFileName])) {
+            self::$__arrInstances[$strLogFileName] = new self($strLogFileName);
         }
-        return self::$arrInstances[$strLogFileName];
+        return self::$__arrInstances[$strLogFileName];
     }
 
     /**
@@ -162,7 +165,7 @@ class SimpleLogger
      *
      * @param string|array|object $logData
      * @param null|string         $strLogTitle
-     * @param bool                $isPrintOnScreen
+     * @param null|bool           $isPrintOnScreen
      *
      * @return bool
      */
@@ -183,14 +186,14 @@ class SimpleLogger
             $memoryUsage        = $this->memoryUsage();
             $this->timeLastSave = $timeStart;
 
-            $strData2Log = sprintf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage, ) . $this->strEol . $this->strPreOpen . 'TITLE: ' . $strLogTitle . $this->strEol . $strDataTmp . $this->strPreClose . $this->strEol . $this->strEol;
+            $strData2Log = sprintf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage) . $this->strEol . $this->strPreOpen . 'TITLE: ' . $strLogTitle . $this->strEol . $strDataTmp . $this->strPreClose . $this->strEol . $this->strEol;
 
             if ($isPrintOnScreen) {
                 echo $strData2Log;
             }
 
             if (!isset($this->strLogFilePath)) {
-                $this->strLogFilePath = $this->getLogFullFileNameWithPath();
+                $this->strLogFilePath = $this->__getLogFullFileNameWithPath();
                 $this->strLogFilePath = dirname($this->strLogFilePath) . DIRECTORY_SEPARATOR . $strLogDate . '_' . basename($this->strLogFilePath);
             }
 
@@ -212,53 +215,6 @@ class SimpleLogger
     }
 
     /**
-     * Constructor
-     * Конструктор
-     *
-     * @param string $strLogFileName Log filename
-     */
-    private function __construct(string $strLogFileName)
-    {
-        $this->setDefaultTimezone($this->strTimezone);
-        $this->strEol         = (php_sapi_name() == 'cli' ? PHP_EOL : '<br>');
-        $this->strPreOpen     = ($this->strEol == '<br>' ? '<pre>' : '');
-        $this->strPreClose    = ($this->strEol == '<br>' ? '</pre>' : '');
-        $this->strLogFileName = $strLogFileName;
-        $this->strUniqId      = $this->uniqIdReal();
-    }
-
-    /**
-     * Returns full path and name of the logfilename (recursive make directories if needed).
-     * Получаем полный путь с именем логфайла (рекурсивно создаем каталоги при необходимости).
-     *
-     * @return string|false
-     */
-    private function getLogFullFileNameWithPath()
-    {
-        try {
-            $this->strLogFileName = str_replace([':', '*', '?', '"', '<', '>', '|'], '', $this->strLogFileName);
-            $this->strLogFileDir  = str_replace([':', '*', '?', '"', '<', '>', '|'], '', rtrim($this->strLogFileDir, '/\\'));
-            $strLogFilePath       = __DIR__ . DIRECTORY_SEPARATOR . '../../../../' . $this->strLogFileDir;
-
-            if (is_dir($strLogFilePath) === false) {
-                if (mkdir($strLogFilePath, 0755, true) === false) {
-                    throw new SimpleLoggerException('Can`t create the directory: [' . $strLogFilePath . ']');
-                    //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при создании каталога для логов', 'Данные: ' . $this->strEol . $strLogFilePath);
-                }
-            }
-
-            if (!is_writable($strLogFilePath)) {
-                throw new SimpleLoggerException('Directory is not writable: [' . $strLogFilePath . ']');
-            }
-
-            return $strLogFilePath . DIRECTORY_SEPARATOR . $this->strLogFileName;
-        } catch (SimpleLoggerException $e) {
-            printf('%s' . $this->strEol, $e->getMessage());
-            return false;
-        }
-    }
-
-    /**
      * Gets a prefixed real unique identifier based on the cryptographically secure function
      * Получаем действительно уникальный идентификатор (с префиксом), основанный на криптографически безопасных функциях
      *
@@ -267,7 +223,7 @@ class SimpleLogger
      *
      * @return string|false
      */
-    protected function uniqIdReal(int $length = 5, string $prefix = '') :string
+    protected function uniqIdReal(int $length = 5, string $prefix = ''): string
     {
         try {
             if (function_exists('random_bytes')) {
@@ -290,7 +246,7 @@ class SimpleLogger
      *
      * @return string|false
      */
-    protected function memoryUsage() :string
+    protected function memoryUsage(): string
     {
         try {
             // Currently memory actually used by the script
@@ -305,12 +261,62 @@ class SimpleLogger
             // Memory used/allocated: %d/%d KB (Peak used/allocated: %d/%d KB)
             return sprintf(
                 '%d/%d KB (%d/%d KB)',
-                    round($memUsageUsed / 1024), round($memUsageAllocated / 1024),
-                        round($memPeakUsed / 1024), round($memPeakAllocated / 1024)
+                round($memUsageUsed / 1024),
+                round($memUsageAllocated / 1024),
+                round($memPeakUsed / 1024),
+                round($memPeakAllocated / 1024)
             );
         } catch (SimpleLoggerException $e) {
             printf('%s' . $this->strEol, $e->getMessage());
             return false;
         }
+    }
+
+    /**
+     * Returns full path and name of the logfilename (recursive make directories if needed).
+     * Получаем полный путь с именем логфайла (рекурсивно создаем каталоги при необходимости).
+     *
+     * @return string|false
+     */
+    private function __getLogFullFileNameWithPath()
+    {
+        try {
+            $this->strLogFileName = str_replace([':', '*', '?', '"', '<', '>', '|'], '', $this->strLogFileName);
+            $this->strLogFileDir  = str_replace([':', '*', '?', '"', '<', '>', '|'], '', rtrim($this->strLogFileDir, '/\\'));
+            $strLogFilePath       = __DIR__ . DIRECTORY_SEPARATOR . '../../../../' . $this->strLogFileDir;
+
+            if (is_dir($strLogFilePath) === false) {
+                if (mkdir($strLogFilePath, 0755, true) === false) {
+                    throw new SimpleLoggerException('Can`t create the directory: [' . $strLogFilePath . ']');
+                    //phpcs:ignore
+                    //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при создании каталога для логов', 'Данные: ' . $this->strEol . $strLogFilePath);
+                }
+            }
+
+            if (!is_writable($strLogFilePath)) {
+                throw new SimpleLoggerException('Directory is not writable: [' . $strLogFilePath . ']');
+            }
+
+            return $strLogFilePath . DIRECTORY_SEPARATOR . $this->strLogFileName;
+        } catch (SimpleLoggerException $e) {
+            printf('%s' . $this->strEol, $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Constructor
+     * Конструктор
+     *
+     * @param string $strLogFileName Log filename
+     */
+    private function __construct(string $strLogFileName)
+    {
+        $this->setDefaultTimezone($this->strTimezone);
+        $this->strEol         = (php_sapi_name() == 'cli' ? PHP_EOL : '<br>');
+        $this->strPreOpen     = ($this->strEol == '<br>' ? '<pre>' : '');
+        $this->strPreClose    = ($this->strEol == '<br>' ? '</pre>' : '');
+        $this->strLogFileName = $strLogFileName;
+        $this->strUniqId      = $this->uniqIdReal();
     }
 }
