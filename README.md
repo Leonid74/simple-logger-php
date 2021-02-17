@@ -4,6 +4,7 @@
 [![CodeFactor](https://www.codefactor.io/repository/github/leonid74/simple-logger-php/badge)](https://www.codefactor.io/repository/github/leonid74/simple-logger-php)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9dd41d7b4c44d280eabc8b80850199)](https://www.codacy.com/gh/Leonid74/simple-logger-php/dashboard)
 [![Code Inspector](https://www.code-inspector.com/project/19215/status/svg)](https://frontend.code-inspector.com/home)
+[![Code Inspector](https://www.code-inspector.com/project/19215/score/svg)](https://frontend.code-inspector.com/home)
 
 # simple-logger-php
 ***Under active development. Not yet for prime production.***
