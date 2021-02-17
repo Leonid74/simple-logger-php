@@ -2,7 +2,7 @@
   <a href="./LICENSE"><img alt="LICENSE" src="https://img.shields.io/badge/license-BSD-blue.svg?maxAge=43200"></a>
   <a href="./README"><img alt="README" src="https://img.shields.io/badge/Author-Leonid74-blue"></a>
   <a href="https://www.codefactor.io/repository/github/leonid74/simple-logger-php"><img src="https://www.codefactor.io/repository/github/leonid74/simple-logger-php/badge" alt="CodeFactor" /></a>
-  <a href="https://www.codacy.com?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Leonid74/simple-logger-php&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/f044eb48469e4e8e9a250c9e72ae69c2"/></a>
+  <a href="https://www.codacy.com/gh/Leonid74/simple-logger-php/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Leonid74/simple-logger-php&amp;utm_campaign=Badge_Grade"><img src="https://app.codacy.com/project/badge/Grade/fe9dd41d7b4c44d280eabc8b80850199"/></a>
   <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/Leonid74/simple-logger-php">
 </div>
 

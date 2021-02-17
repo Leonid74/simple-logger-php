@@ -80,8 +80,8 @@ class SimpleLogger
     protected $strTimezone = 'Europe/Moscow';
 
     /**
-     * Tag of carriage returns (PHP_EOL или '<br>')
-     * Тег перевода строки (PHP_EOL или '<br>')
+     * Tag of carriage returns based on the type of run (PHP_EOL или '<br>')
+     * Тег перевода строки, исходя из типа запуска (PHP_EOL или '<br>')
      *
      * @var string
      */
