@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Main exception class used for error handling
  * Основной класс, используемый для обработки ошибок
@@ -13,7 +14,7 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Leonid74\SimpleLogger\Exception;
 
@@ -25,7 +26,6 @@ class SimpleLoggerException extends \Exception
         parent::__construct('SimpleLogger caught the error!' . $strEOL . $strEOL .
                             'Error code: ' . ($code ? $code : 'unknown') . $strEOL .
                             'Error text: ' . $message . $strEOL . $strEOL .
-                            'Exitting.', $code, $previous
-                        );
+                            'Exitting.', $code, $previous);
     }
 }
