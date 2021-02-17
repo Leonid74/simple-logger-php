@@ -166,7 +166,7 @@ class SimpleLogger
      *
      * @return bool
      */
-    public function toLog($logData, $strLogTitle = null, $isPrintOnScreen = false)
+    public function toLog($logData, $strLogTitle = null, $isPrintOnScreen = null)
     {
         try {
             if (!$this->isEnable) {
@@ -178,6 +178,7 @@ class SimpleLogger
             $strLogDate         = date('Y-m-d');
             $strLogDateTime     = date('Y-m-d H:i:s P');
             $strLogTitle        = $strLogTitle ?? 'DEBUG';
+            $isPrintOnScreen    = $isPrintOnScreen ?? false;
             $strDataTmp         = is_string($logData) ? $logData : var_export($logData, true);
             $memoryUsage        = $this->memoryUsage();
             $this->timeLastSave = $timeStart;
