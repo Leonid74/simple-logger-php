@@ -80,12 +80,28 @@ class SimpleLogger
     protected $strTimezone = 'Europe/Moscow';
 
     /**
-     * Type of the interface between web server and PHP script - command line or not
-     * Тип запуска скрипта - из командной строки или нет
+     * Tag of carriage returns (PHP_EOL или '<br>')
+     * Тег перевода строки (PHP_EOL или '<br>')
      *
      * @var string
      */
-    protected $isCommandLine;
+    protected $strEol;
+
+    /**
+     * Open tag of pre-formatted text based on the type of run (cli = '' or web = '<pre>')
+     * Открывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '<pre>')
+     *
+     * @var string
+     */
+    protected $strPreOpen;
+
+    /**
+     * Close tag of pre-formatted text based on the type of run (cli = '' or web = '</pre>')
+     * Закрывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '</pre>')
+     *
+     * @var string
+     */
+    protected $strPreClose;
 
     /**
      * Instances array for the each Log filename
@@ -160,14 +176,10 @@ class SimpleLogger
             $memoryUsage        = $this->memoryUsage();
             $this->timeLastSave = $timeStart;
 
-            $strData2Log = sprintf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage, ) . PHP_EOL . '[ TITLE: ' . $strLogTitle . ' ]' . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
+            $strData2Log = sprintf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage, ) . $this->strEol . $this->strPreOpen . 'TITLE: ' . $strLogTitle . $this->strEol . $strDataTmp . $this->strPreClose . $this->strEol . $this->strEol;
 
             if ($isPrintOnScreen) {
-                if ($this->isCommandLine) {
-                    echo $strData2Log;
-                } else {
-                    printf('[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage, ) . '<br><pre>TITLE: ' . $strLogTitle . '<br>' . $strDataTmp . '</pre><br><br>';
-                }
+                echo $strData2Log;
             }
 
             if (!isset($this->strLogFilePath)) {
@@ -180,14 +192,14 @@ class SimpleLogger
                     throw new SimpleLoggerException('Logfile is not writable: ' . $this->strLogFilePath);
                 }
                 throw new SimpleLoggerException('Can`t write to the log file: [' . $this->strLogFilePath . ']');
-                //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при записи в лог', 'Данные: ' . PHP_EOL . $strData2Log);
+                //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при записи в лог', 'Данные: ' . $this->strEol . $strData2Log);
             }
 
-            //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': ' . $strLogTitle, 'Данные: ' . PHP_EOL . $strData2Log);
+            //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': ' . $strLogTitle, 'Данные: ' . $this->strEol . $strData2Log);
 
             return true;
         } catch (SimpleLoggerException $e) {
-            printf('%s' . PHP_EOL, $e->getMessage());
+            printf('%s' . $this->strEol, $e->getMessage());
             return false;
         }
     }
@@ -201,7 +213,9 @@ class SimpleLogger
     private function __construct(string $strLogFileName)
     {
         $this->setDefaultTimezone($this->strTimezone);
-        $this->isCommandLine  = (php_sapi_name() == 'cli' ? true : false);
+        $this->strEol         = (php_sapi_name() == 'cli' ? PHP_EOL : '<br>');
+        $this->strPreOpen     = ($this->strEol == '<br>' ? '<pre>' : '');
+        $this->strPreClose    = ($this->strEol == '<br>' ? '</pre>' : '');
         $this->strLogFileName = $strLogFileName;
         $this->strUniqId      = $this->uniqIdReal();
     }
@@ -222,7 +236,7 @@ class SimpleLogger
             if (is_dir($strLogFilePath) === false) {
                 if (mkdir($strLogFilePath, 0755, true) === false) {
                     throw new SimpleLoggerException('Can`t create the directory: [' . $strLogFilePath . ']');
-                    //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при создании каталога для логов', 'Данные: ' . PHP_EOL . $strLogFilePath);
+                    //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при создании каталога для логов', 'Данные: ' . $this->strEol . $strLogFilePath);
                 }
             }
 
@@ -232,7 +246,7 @@ class SimpleLogger
 
             return $strLogFilePath . DIRECTORY_SEPARATOR . $this->strLogFileName;
         } catch (SimpleLoggerException $e) {
-            printf('%s' . PHP_EOL, $e->getMessage());
+            printf('%s' . $this->strEol, $e->getMessage());
             return false;
         }
     }
@@ -258,7 +272,7 @@ class SimpleLogger
             }
             return $prefix . substr(bin2hex($bytes), 0, $length);
         } catch (SimpleLoggerException $e) {
-            printf('%s' . PHP_EOL, $e->getMessage());
+            printf('%s' . $this->strEol, $e->getMessage());
             return false;
         }
     }
@@ -288,7 +302,7 @@ class SimpleLogger
                         round($memPeakUsed / 1024), round($memPeakAllocated / 1024)
             );
         } catch (SimpleLoggerException $e) {
-            printf('%s' . PHP_EOL, $e->getMessage());
+            printf('%s' . $this->strEol, $e->getMessage());
             return false;
         }
     }
