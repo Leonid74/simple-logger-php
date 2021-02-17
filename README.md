@@ -1,8 +1,10 @@
 [![License](https://img.shields.io/badge/license-BSD-blue.svg?maxAge=43200)](./LICENSE)
 [![Author](https://img.shields.io/badge/Author-Leonid74-blue.svg)](https://github.com/Leonid74)
+[![Latest Stable Version](https://img.shields.io/github/v/release/Leonid74/simple-logger-php)](https://github.com/Leonid74/simple-logger-php/releases/latest)
 [![CodeFactor](https://www.codefactor.io/repository/github/leonid74/simple-logger-php/badge)](https://www.codefactor.io/repository/github/leonid74/simple-logger-php)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9dd41d7b4c44d280eabc8b80850199)](https://www.codacy.com/gh/Leonid74/simple-logger-php/dashboard)
-[![Latest Stable Version](https://img.shields.io/github/v/release/Leonid74/simple-logger-php)](https://github.com/Leonid74/simple-logger-php/releases/latest)
+[![Code Inspector](https://www.code-inspector.com/project/19215/status/svg)](https://frontend.code-inspector.com/home)
+
 
 # simple-logger-php
 ***Under active development. Not yet for prime production.***
