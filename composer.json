@@ -35,7 +35,7 @@
             "@composer dump-autoload"
         ],
         "check-code": [
-            "phpcs -snp src/ tests/"
+            "phpcs -sp src/ tests/"
         ]
     },
     "config": {
