@@ -20,7 +20,7 @@ Add `leonid74/simple-logger-php` to `composer.json` either by running `composer 
 
     "require": {
        // ...
-       "leonid74/simple-logger-php": "^0.3"
+       "leonid74/simple-logger-php": "^0.1.3"
        // ...
     }
 
