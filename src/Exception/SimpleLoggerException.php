@@ -23,7 +23,7 @@ class SimpleLoggerException extends \Exception
         $strEOL = ( PHP_SAPI === 'cli' ? PHP_EOL : '<br>' );
         parent::__construct(
             'SimpleLogger caught the error!' . $strEOL . $strEOL .
-            'Error code: ' . ( $code ?? 'unknown' ) . $strEOL .
+            'Error code: ' . $code . $strEOL .
             'Error text: ' . $message . $strEOL . $strEOL .
             'Exitting.',
             $code,

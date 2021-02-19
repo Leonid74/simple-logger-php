@@ -161,11 +161,13 @@ class SimpleLogger
             $memoryUsage = $this->_memoryUsage();
             $this->timeLastSave = $timeStart;
 
-            $strData2Log = sprintf( '[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage ) . $this->strEol . $this->strPreOpen . 'TITLE: ' . $strLogTitle . $this->strEol . $strDataTmp . $this->strPreClose . $this->strEol . $this->strEol;
+            $strData2Log = sprintf( '[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage );
 
             if ( $isPrintOnScreen ) {
-                printf( '%s', $strData2Log );
+                printf( '%s', $strData2Log . '<br>TITLE: ' . $strLogTitle . '<br><pre>' . $strDataTmp . '</pre><br><br>' );
             }
+
+            $strData2Log .= PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
 
             if ( !isset( $this->strLogFilePath ) ) {
                 $this->strLogFilePath = $this->_getLogFullFileNameWithPath();
@@ -199,15 +201,6 @@ class SimpleLogger
         $this->setDefaultTimezone( $this->strTimezone );
         $this->strLogFileName = $strLogFileName;
         $this->strUniqId = $this->_uniqIdReal();
-        $this->strEol = PHP_EOL;
-        $this->strPreOpen = '';
-        $this->strPreClose = '';
-
-        if ( PHP_SAPI !== 'cli' ) {
-            $this->strEol = '<br>';
-            $this->strPreOpen = '<pre>';
-            $this->strPreClose = '</pre>';
-        }
     }
 
     /**
