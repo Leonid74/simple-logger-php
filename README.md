@@ -14,7 +14,7 @@ Simple logger class that creates logs when an exception is thrown and sends debu
 Installation
 -----
 
-### Recommended installation via composer:
+#### Recommended installation via composer:
 
 Add `leonid74/simple-logger-php` to `composer.json` either by running `composer require leonid74/simple-logger-php` or by defining it manually:
 
