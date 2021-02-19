@@ -9,7 +9,7 @@
     ],
     "homepage": "https://github.com/leonid74/simple-logger-php",
     "minimum-stability": "stable",
-    "license": "BSD",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "leonid74",
@@ -18,7 +18,7 @@
         }
     ],
     "require": {
-        "php": "^7.2"
+        "php": ">=7.0"
     },
     "require-dev": {
         "automattic/phpcs-neutron-standard": "^1.7",

@@ -1,6 +1,6 @@
 # VisualStudioCode.gitignore
 .history/
-.vscode/*
+.vscode/
 .vscode-test
 #!.vscode/settings.json
 #!.vscode/tasks.json
