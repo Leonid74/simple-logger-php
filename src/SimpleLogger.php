@@ -161,13 +161,11 @@ class SimpleLogger
             $memoryUsage = $this->_memoryUsage();
             $this->timeLastSave = $timeStart;
 
-            $strData2Log = sprintf( '[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage );
+            $strData2Log = sprintf( '[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage ) . PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
 
             if ( $isPrintOnScreen ) {
-                printf( '%s', $strData2Log . '<br>TITLE: ' . $strLogTitle . '<br><pre>' . $strDataTmp . '</pre><br><br>' );
+                echo ( PHP_SAPI === 'cli' ? $strData2Log : '<pre>' . htmlspecialchars( $strData2Log ) . '</pre>' );
             }
-
-            $strData2Log .= PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
 
             if ( !isset( $this->strLogFilePath ) ) {
                 $this->strLogFilePath = $this->_getLogFullFileNameWithPath();

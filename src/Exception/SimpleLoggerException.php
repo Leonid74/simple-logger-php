@@ -16,9 +16,11 @@
 
 namespace Leonid74\SimpleLogger\Exception;
 
-class SimpleLoggerException extends \Exception
+use Exception;
+
+class SimpleLoggerException extends Exception
 {
-    public function __construct( string $message = '', int $code = 0, \Exception $previous = null )
+    public function __construct( string $message, int $code = 0, ?Exception $previous = null )
     {
         $strEOL = ( PHP_SAPI === 'cli' ? PHP_EOL : '<br>' );
         parent::__construct(
