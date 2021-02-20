@@ -177,6 +177,7 @@ class SimpleLogger
                     throw new SimpleLoggerException( 'Logfile is not writable: ' . $this->strLogFilePath );
                 }
                 throw new SimpleLoggerException( 'Can`t write to the log file: [' . $this->strLogFilePath . ']' );
+
                 //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при записи в лог', 'Данные: ' . $this->strEol . $strData2Log);
             }
 
