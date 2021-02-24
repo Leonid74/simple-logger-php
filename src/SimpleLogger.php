@@ -33,7 +33,13 @@ class SimpleLogger
      * Directory for the log file
      * Каталог для лог файла
      */
-    public string $strLogFileDir = '../../../../logs/';
+    public string $strLogFileDir = 'logs';
+
+    /**
+     * String for the default timezone like 'Europe/Moscow' or 'UTC' etc.
+     * Строка для установки таймзоны по-умолчанию
+     */
+    public string $strTimezone = 'Europe/Moscow';
 
     /**
      * Log filename
@@ -58,12 +64,6 @@ class SimpleLogger
      * Уникальный идентификатор для логфайла
      */
     protected string $strUniqId;
-
-    /**
-     * String for the default timezone like 'Europe/Moscow' or 'UTC' etc.
-     * Строка для установки таймзоны по-умолчанию
-     */
-    protected string $strTimezone = 'Europe/Moscow';
 
     /**
      * Tag of carriage returns based on the type of run (PHP_EOL или '<br>')
@@ -98,8 +98,9 @@ class SimpleLogger
      */
     public static function getInstance( string $strLogFileName = 'debug.log' ): self
     {
-        // Сделать оценку активности при вызове, с учетом порядка вызова функций
-        //if (!self::$isEnable) return false;
+        if ( !isset( self::$isEnable ) || !self::$isEnable ) {
+            return false;
+        }
 
         if ( !isset( self::$_arrInstances[$strLogFileName] ) ) {
             self::$_arrInstances[$strLogFileName] = new self( $strLogFileName );
@@ -122,12 +123,12 @@ class SimpleLogger
             return false;
         }
 
-        if ( strtolower( trim( $strTimezone ) ) === strtolower( $this->strTimezone ) ) {
+        if ( \strtolower( \trim( $strTimezone ) ) === \strtolower( $this->strTimezone ) ) {
             return true;
         }
 
-        if ( !date_default_timezone_set( $strTimezone ) ) {
-            throw new SimpleLoggerException( 'Cannot set Default Timezone' );
+        if ( !\date_default_timezone_set( $strTimezone ) ) {
+            throw new \Exception( 'Cannot set Default Timezone' );
         }
 
         $this->strTimezone = $strTimezone;
@@ -144,47 +145,43 @@ class SimpleLogger
      *
      * @return bool
      */
-    public function toLog( mixed $logData, ?string $strLogTitle = null, ?bool $isPrintOnScreen = null ): bool
+    public function toLog( $logData, ?string $strLogTitle = 'DEBUG', ?bool $isPrintOnScreen = null ): bool
     {
         try {
             if ( !$this->isEnable ) {
                 return false;
             }
 
-            $timeStart = microtime( true );
-            $timeElapsed = isset( $this->timeLastSave ) ? sprintf( ', +%.5f sec', $timeStart - $this->timeLastSave ) : ', new session!';
-            $strLogDate = date( 'Y-m-d' );
-            $strLogDateTime = date( 'Y-m-d H:i:s P' );
-            $strLogTitle = $strLogTitle ?? 'DEBUG';
+            $timeStart = \microtime( true );
+            $timeElapsed = isset( $this->timeLastSave ) ? \sprintf( ', +%.5f sec', $timeStart - $this->timeLastSave ) : ', new session!';
+            //$strLogTitle = $strLogTitle ?? 'DEBUG';
             $isPrintOnScreen = $isPrintOnScreen ?? false;
-            $strDataTmp = is_string( $logData ) ? $logData : var_export( $logData, true );
+            $strDataTmp = \is_string( $logData ) ? $logData : \var_export( $logData, true );
             $memoryUsage = $this->_memoryUsage();
             $this->timeLastSave = $timeStart;
 
-            $strData2Log = sprintf( '[ %s ] [ %s ] [ %s ]', $strLogDateTime . $timeElapsed, 'session: ' . $this->strUniqId, 'memory: ' . $memoryUsage ) . PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
+            $strData2Log = sprintf(
+                '[ %s ] [ %s ] [ %s ]',
+                \date( 'Y-m-d H:i:s P' ) . $timeElapsed,
+                'session: ' . $this->strUniqId,
+                'memory: ' . $memoryUsage
+            );
+            $strData2Log .= PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
 
             if ( $isPrintOnScreen ) {
-                echo ( PHP_SAPI === 'cli' ? $strData2Log : '<pre>' . htmlspecialchars( $strData2Log ) . '</pre>' );
+                echo ( PHP_SAPI === 'cli' ? $strData2Log : '<pre>' . \htmlspecialchars( $strData2Log ) . '</pre>' );
             }
 
             if ( !isset( $this->strLogFilePath ) ) {
                 $this->strLogFilePath = $this->_getLogFullFileNameWithPath();
-                $this->strLogFilePath = dirname( $this->strLogFilePath ) . DIRECTORY_SEPARATOR . $strLogDate . '_' . basename( $this->strLogFilePath );
             }
 
-            if ( @file_put_contents( $this->strLogFilePath, $strData2Log, FILE_APPEND | LOCK_EX ) === false ) {
-                if ( !is_writable( $this->strLogFilePath ) ) {
-                    throw new SimpleLoggerException( 'Logfile is not writable: ' . $this->strLogFilePath );
-                }
-                throw new SimpleLoggerException( 'Can`t write to the log file: [' . $this->strLogFilePath . ']' );
-
-                //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при записи в лог', 'Данные: ' . $this->strEol . $strData2Log);
-            }
+            $resultAppend = $this->_append( $this->strLogFilePath, $strData2Log );
 
             //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': ' . $strLogTitle, 'Данные: ' . $this->strEol . $strData2Log);
 
-            return true;
-        } catch ( \Throwable $e ) {
+            return $resultAppend;
+        } catch ( \Exception $e ) {
             throw new SimpleLoggerException( $e->getMessage() );
         }
     }
@@ -203,6 +200,29 @@ class SimpleLogger
     }
 
     /**
+     * Appends a log message to a file.
+     * Добавляем сообщение в лог файл.
+     *
+     * @param string $filename The filename to append
+     * @param string $message The message to append
+     *
+     * @return bool
+     */
+    private function _append( string $filename, string $message ): bool
+    {
+        if ( @\file_put_contents( $filename, $message, FILE_APPEND | LOCK_EX ) === false ) {
+            if ( !\is_writable( $filename ) ) {
+                throw new \Exception( 'Logfile is not writable: ' . $filename );
+            }
+            throw new \Exception( 'Can`t write to the log file: [' . $filename . ']' );
+
+            //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при записи в лог', 'Данные: ' . $this->strEol . $message);
+        }
+
+        return true;
+    }
+
+    /**
      * Gets a prefixed real unique identifier based on the cryptographically secure function
      * Получаем действительно уникальный идентификатор (с префиксом), основанный на криптографически безопасных функциях
      *
@@ -214,15 +234,15 @@ class SimpleLogger
     private function _uniqIdReal( int $length = 5, string $prefix = '' ): string
     {
         try {
-            if ( function_exists( 'random_bytes' ) ) {
-                $bytes = random_bytes( (int) ceil( $length / 2 ) );
-                return $prefix . substr( bin2hex( $bytes ), 0, $length );
-            } elseif ( function_exists( 'openssl_random_pseudo_bytes' ) ) {
-                $bytes = openssl_random_pseudo_bytes( (int) ceil( $length / 2 ) );
-                return $prefix . substr( bin2hex( $bytes ), 0, $length );
+            if ( \function_exists( 'random_bytes' ) ) {
+                $bytes = \random_bytes( (int) \ceil( $length / 2 ) );
+                return $prefix . \substr( \bin2hex( $bytes ), 0, $length );
+            } elseif ( \function_exists( 'openssl_random_pseudo_bytes' ) ) {
+                $bytes = \openssl_random_pseudo_bytes( (int) \ceil( $length / 2 ) );
+                return $prefix . \substr( \bin2hex( $bytes ), 0, $length );
             }
-            throw new SimpleLoggerException( 'Found no available cryptographically secure random function' );
-        } catch ( \Throwable $e ) {
+            throw new \Exception( 'Found no available cryptographically secure random function' );
+        } catch ( \Exception $e ) {
             throw new SimpleLoggerException( $e->getMessage() );
         }
     }
@@ -237,23 +257,23 @@ class SimpleLogger
     {
         try {
             // Currently memory actually used by the script
-            $memUsageUsed = memory_get_usage();
+            $memUsageUsed = \memory_get_usage();
             // Currently memory actually allocated for the script
-            $memUsageAllocated = memory_get_usage( true );
+            $memUsageAllocated = \memory_get_usage( true );
             // Peak memory memory actually used by the script
-            $memPeakUsed = memory_get_peak_usage();
+            $memPeakUsed = \memory_get_peak_usage();
             // Peak memory memory actually allocated for the script
-            $memPeakAllocated = memory_get_peak_usage( true );
+            $memPeakAllocated = \memory_get_peak_usage( true );
 
             // Memory used/allocated: %d/%d KB (Peak used/allocated: %d/%d KB)
-            return sprintf(
+            return \sprintf(
                 '%d/%d KB (%d/%d KB)',
-                round( $memUsageUsed / 1024 ),
-                round( $memUsageAllocated / 1024 ),
-                round( $memPeakUsed / 1024 ),
-                round( $memPeakAllocated / 1024 )
+                \round( $memUsageUsed / 1024 ),
+                \round( $memUsageAllocated / 1024 ),
+                \round( $memPeakUsed / 1024 ),
+                \round( $memPeakAllocated / 1024 )
             );
-        } catch ( \Throwable $e ) {
+        } catch ( \Exception $e ) {
             throw new SimpleLoggerException( $e->getMessage() );
         }
     }
@@ -267,24 +287,40 @@ class SimpleLogger
     private function _getLogFullFileNameWithPath(): string
     {
         try {
-            $this->strLogFileName = str_replace( [':', '*', '?', '"', '<', '>', '|'], '', $this->strLogFileName );
-            $this->strLogFileDir = str_replace( [':', '*', '?', '"', '<', '>', '|'], '', rtrim( $this->strLogFileDir, '/\\' ) );
-            $strLogFilePath = __DIR__ . DIRECTORY_SEPARATOR . '../../../../' . $this->strLogFileDir;
+            $this->strLogFileDir = $this->_getClearedFileName( $this->strLogFileDir );
 
-            if ( is_dir( $strLogFilePath ) === false ) {
-                if ( mkdir( $strLogFilePath, 0755, true ) === false ) {
-                    throw new SimpleLoggerException( 'Can`t create the directory: [' . $strLogFilePath . ']' );
+            $strLogFilePath = __DIR__ . \str_repeat( DIRECTORY_SEPARATOR . '..', 4 ) . DIRECTORY_SEPARATOR . $this->strLogFileDir;
+
+            if ( \is_dir( $strLogFilePath ) === false ) {
+                if ( \mkdir( $strLogFilePath, 0755, true ) === false ) {
+                    throw new \Exception( 'Can`t create the directory: [' . $strLogFilePath . ']' );
                     //mail(_EMAIL4ERROR, _SITE_ERROR_ID . ': Ошибка при создании каталога для логов', 'Данные: ' . $this->strEol . $strLogFilePath);
                 }
             }
 
-            if ( !is_writable( $strLogFilePath ) ) {
-                throw new SimpleLoggerException( 'Directory is not writable: [' . $strLogFilePath . ']' );
+            if ( !\is_writable( $strLogFilePath ) ) {
+                throw new \Exception( 'Directory is not writable: [' . $strLogFilePath . ']' );
             }
 
-            return $strLogFilePath . DIRECTORY_SEPARATOR . $this->strLogFileName;
-        } catch ( \Throwable $e ) {
+            $this->strLogFileName = $this->_getClearedFileName( $this->strLogFileName );
+
+            return $strLogFilePath . DIRECTORY_SEPARATOR . \date( 'Y-m-d' ) . '_' . $this->strLogFileName;
+        } catch ( \Exception $e ) {
             throw new SimpleLoggerException( $e->getMessage() );
         }
+    }
+
+    /**
+     * Returns the file name cleared of characters that are not recommended for use in the file name.
+     * Получаем имя файла, очищенное от символов, не рекомендуемых к использоанию в имени файла.
+     *
+     * @return string
+     */
+    private function _getClearedFileName( string $strRawFileName ): string
+    {
+        $strRawFileName = \filter_var( $strRawFileName, FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_LOW );
+        $strRawFileName = \str_replace( ['<', '>', ':', '"', '/', '\\', '|', '?', '*'], '', $strRawFileName );
+
+        return $strRawFileName;
     }
 }
