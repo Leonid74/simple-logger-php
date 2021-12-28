@@ -42,6 +42,24 @@ class SimpleLogger
     public string $strTimezone = 'Europe/Moscow';
 
     /**
+     * Tag of carriage returns based on the type of run (PHP_EOL или '<br>')
+     * Тег перевода строки, исходя из типа запуска (PHP_EOL или '<br>')
+     */
+    public string $strEol = ( PHP_SAPI === 'cli' ? PHP_EOL : '<br>' );
+
+    /**
+     * Open tag of pre-formatted text based on the type of run (cli = '' or web = '<pre>')
+     * Открывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '<pre>')
+     */
+    public string $strPreOpen = ( PHP_SAPI === 'cli' ? '' : '<pre>' );
+
+    /**
+     * Close tag of pre-formatted text based on the type of run (cli = '' or web = '</pre>')
+     * Закрывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '</pre>')
+     */
+    public string $strPreClose = ( PHP_SAPI === 'cli' ? '' : '</pre>' );
+
+    /**
      * Log filename
      * Имя логфайла
      */
@@ -64,24 +82,6 @@ class SimpleLogger
      * Уникальный идентификатор для логфайла
      */
     protected string $strUniqId;
-
-    /**
-     * Tag of carriage returns based on the type of run (PHP_EOL или '<br>')
-     * Тег перевода строки, исходя из типа запуска (PHP_EOL или '<br>')
-     */
-    protected string $strEol;
-
-    /**
-     * Open tag of pre-formatted text based on the type of run (cli = '' or web = '<pre>')
-     * Открывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '<pre>')
-     */
-    protected string $strPreOpen;
-
-    /**
-     * Close tag of pre-formatted text based on the type of run (cli = '' or web = '</pre>')
-     * Закрывающий тег предварительно форматированного текста, исходя из типа запуска (cli = '' или web = '</pre>')
-     */
-    protected string $strPreClose;
 
     /**
      * Instances array for the each Log filename
@@ -145,16 +145,16 @@ class SimpleLogger
      *
      * @return bool
      */
-    public function toLog( $logData, ?string $strLogTitle = 'DEBUG', ?bool $isPrintOnScreen = null ): bool
+    public function toLog( $logData, ?string $strLogTitle, ?bool $isPrintOnScreen ): bool
     {
-        try {
-            if ( !$this->isEnable ) {
-                return false;
-            }
+        if ( !$this->isEnable ) {
+            return false;
+        }
 
+        try {
             $timeStart = \microtime( true );
             $timeElapsed = isset( $this->timeLastSave ) ? \sprintf( ', +%.5f sec', $timeStart - $this->timeLastSave ) : ', new session!';
-            //$strLogTitle = $strLogTitle ?? 'DEBUG';
+            $strLogTitle = isset( $strLogTitle ) ? $strLogTitle : 'DEBUG';
             $isPrintOnScreen = $isPrintOnScreen ?? false;
             $strDataTmp = \is_string( $logData ) ? $logData : \var_export( $logData, true );
             $memoryUsage = $this->_memoryUsage();
@@ -169,7 +169,7 @@ class SimpleLogger
             $strData2Log .= PHP_EOL . 'TITLE: ' . $strLogTitle . PHP_EOL . $strDataTmp . PHP_EOL . PHP_EOL;
 
             if ( $isPrintOnScreen ) {
-                echo ( PHP_SAPI === 'cli' ? $strData2Log : '<pre>' . \htmlspecialchars( $strData2Log ) . '</pre>' );
+                echo ( PHP_SAPI === 'cli' ? $strData2Log : $this->strPreOpen . \htmlspecialchars( $strData2Log ) . $this->strPreClose );
             }
 
             if ( !isset( $this->strLogFilePath ) ) {
